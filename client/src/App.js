@@ -14,7 +14,8 @@ const App = () => {
     resetState();
 
     try {
-      const response = await axios.get(`http://localhost:4000/api/results/2020/ICT/${regNo}`);
+      // Update the URL to use your Heroku backend
+      const response = await axios.get(`https://mighty-shore-09951-f4e37da611f2.herokuapp.com/api/results/2020/ICT/${regNo}`);
       setResults(response.data);
     } catch (err) {
       setError('No results found for the given registration number.');
@@ -30,24 +31,22 @@ const App = () => {
   const downloadPDF = () => {
     const input = document.getElementById('results-container');
     const downloadButton = document.querySelector('.download-button');
-  
-    // Hide the download button before capturing
+
     downloadButton.style.display = 'none';
-  
+
     html2canvas(input, {
-      scale: 2, // Higher resolution
-      useCORS: true, // To respect external styles
+      scale: 2,
+      useCORS: true,
     }).then((canvas) => {
-      // Show the button again after capture
       downloadButton.style.display = 'block';
-  
+
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'p',
         unit: 'px',
         format: [canvas.width, canvas.height],
       });
-  
+
       pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
       pdf.save(`results_${regNo}.pdf`);
     });
@@ -55,22 +54,18 @@ const App = () => {
 
   const renderResults = () => {
     if (!results) return null;
-  
-    // Get an array of semester entries
+
     const semesterEntries = Object.entries(results.semesterResults);
-  
-    // Group semesters into pairs (2 semesters per row)
     const semesterGroups = [];
     for (let i = 0; i < semesterEntries.length; i += 2) {
       semesterGroups.push(semesterEntries.slice(i, i + 2));
     }
-  
+
     return (
       <div id="results-container" className="results-container">
         <h2 className="results-title">Registration Number : {results.regNo}</h2>
         <h2 className="student-name">Name : {results.name}</h2>
-  
-        {/* Grid layout for semester results in 2x2 */}
+
         <div className="semester-grid">
           {semesterGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="semester-grid-row">
@@ -100,11 +95,11 @@ const App = () => {
             </div>
           ))}
         </div>
-  
+
         <div className="ocgpa-section">
           <h3 className="overall-gpa">Overall GPA: {results.overallGpa}</h3>
         </div>
-  
+
         <div className="download-button-container">
           <button onClick={downloadPDF} className="download-button no-print">
             Download as PDF
