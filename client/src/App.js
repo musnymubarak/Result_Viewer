@@ -5,7 +5,9 @@ import jsPDF from 'jspdf';
 import './App.css';
 
 const App = () => {
-  const [regNo, setRegNo] = useState('');
+  const [year, setYear] = useState('');
+  const [department, setDepartment] = useState('');
+  const [number, setNumber] = useState('');
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
 
@@ -14,8 +16,9 @@ const App = () => {
     resetState();
 
     try {
-      // Update the URL to use your Heroku backend
-      const response = await axios.get(`https://mighty-shore-09951-f4e37da611f2.herokuapp.com/api/results/2020/ICT/${regNo}`);
+      const response = await axios.get(
+        `https://apiuov-pv98eu7s.b4a.run/api/results/${year}/${department}/${number}`
+      );
       setResults(response.data);
     } catch (err) {
       setError('No results found for the given registration number.');
@@ -48,7 +51,7 @@ const App = () => {
       });
 
       pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-      pdf.save(`results_${regNo}.pdf`);
+      pdf.save(`results_${year}_${department}_${number}.pdf`);
     });
   };
 
@@ -63,8 +66,8 @@ const App = () => {
 
     return (
       <div id="results-container" className="results-container">
-        <h2 className="results-title">Registration Number : {results.regNo}</h2>
-        <h2 className="student-name">Name : {results.name}</h2>
+        <h2 className="results-title">Registration Number: {results.regNo}</h2>
+        <h2 className="student-name">Name: {results.name}</h2>
 
         <div className="semester-grid">
           {semesterGroups.map((group, groupIndex) => (
@@ -98,6 +101,7 @@ const App = () => {
 
         <div className="ocgpa-section">
           <h3 className="overall-gpa">Overall GPA: {results.overallGpa}</h3>
+          <h3 className="oc-gpa">OCGPA: {results.ocGPA}</h3>
         </div>
 
         <div className="download-button-container">
@@ -115,13 +119,31 @@ const App = () => {
       <form onSubmit={handleSubmit} className="search-form">
         <input
           type="text"
-          placeholder="Enter Registration No"
-          value={regNo}
-          onChange={(e) => setRegNo(e.target.value)}
+          placeholder="Enter Year (e.g., 2020)"
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
           required
           className="search-input"
         />
-        <button type="submit" className="search-button">Get Results</button>
+        <input
+          type="text"
+          placeholder="Enter Department (e.g., ICT)"
+          value={department}
+          onChange={(e) => setDepartment(e.target.value)}
+          required
+          className="search-input"
+        />
+        <input
+          type="text"
+          placeholder="Enter Number (e.g., 001)"
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+          required
+          className="search-input"
+        />
+        <button type="submit" className="search-button">
+          Get Results
+        </button>
       </form>
 
       {error && <p className="error-message">{error}</p>}
