@@ -101,7 +101,6 @@ const App = () => {
 
         <div className="ocgpa-section">
           <h3 className="overall-gpa">Overall GPA: {results.overallGpa}</h3>
-          <h3 className="oc-gpa">OCGPA: {results.ocGPA}</h3>
         </div>
 
         <div className="download-button-container">
