@@ -134,7 +134,7 @@ const App = () => {
         />
         <input
           type="text"
-          placeholder="Enter Number (e.g., 001)"
+          placeholder="Enter Number (e.g., 01)"
           value={number}
           onChange={(e) => setNumber(e.target.value)}
           required
