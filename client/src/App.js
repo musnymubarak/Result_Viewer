@@ -17,7 +17,7 @@ const App = () => {
 
     try {
       const response = await axios.get(
-        `https://apiuov-pv98eu7s.b4a.run/api/results/${year}/${department}/${number}`
+        https://result-backend-vkcw.onrender.com/api/results/${year}/${department}/${number}`
       );
       setResults(response.data);
     } catch (err) {
