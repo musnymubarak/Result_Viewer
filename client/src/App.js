@@ -5,8 +5,8 @@ import jsPDF from 'jspdf';
 import './App.css';
 
 const App = () => {
-  const [year, setYear] = useState('');
-  const [department, setDepartment] = useState('');
+  const [year, setYear] = useState('2020'); // Default Year
+  const [department, setDepartment] = useState('ICT'); // Default Department
   const [number, setNumber] = useState('');
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
@@ -17,7 +17,7 @@ const App = () => {
 
     try {
       const response = await axios.get(
-         `https://result-backend-vkcw.onrender.com/api/results/${year}/${department}/${number}`
+        `https://result-backend-vkcw.onrender.com/api/results/${year}/${department}/${number}`
       );
       setResults(response.data);
     } catch (err) {
@@ -59,41 +59,34 @@ const App = () => {
     if (!results) return null;
 
     const semesterEntries = Object.entries(results.semesterResults);
-    const semesterGroups = [];
-    for (let i = 0; i < semesterEntries.length; i += 2) {
-      semesterGroups.push(semesterEntries.slice(i, i + 2));
-    }
 
     return (
       <div id="results-container" className="results-container">
         <h2 className="results-title">Registration Number: {results.regNo}</h2>
         <h2 className="student-name">Name: {results.name}</h2>
 
+        {/* Show semesters in a grid of cards */}
         <div className="semester-grid">
-          {semesterGroups.map((group, groupIndex) => (
-            <div key={groupIndex} className="semester-grid-row">
-              {group.map(([semester, data]) => (
-                <div key={semester} className="semester-item">
-                  <h3 className="sheet-heading">Results for {semester}</h3>
-                  {data.courses.map((course, index) => (
-                    <table key={index} className="results-table">
-                      <thead>
-                        <tr>
-                          <th>Course</th>
-                          <th>Grade</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Object.entries(course).map(([subject, grade]) => (
-                          <tr key={subject}>
-                            <td>{subject}</td>
-                            <td>{grade}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ))}
-                </div>
+          {semesterEntries.map(([semester, data]) => (
+            <div key={semester} className="semester-item">
+              <h3 className="sheet-heading">{semester}</h3>
+              {data.courses.map((course, index) => (
+                <table key={index} className="results-table">
+                  <thead>
+                    <tr>
+                      <th>Course</th>
+                      <th>Grade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(course).map(([subject, grade]) => (
+                      <tr key={subject}>
+                        <td>{subject}</td>
+                        <td>{grade}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ))}
             </div>
           ))}
@@ -116,25 +109,24 @@ const App = () => {
     <div className="app-container">
       <h1>Results Viewer</h1>
       <form onSubmit={handleSubmit} className="search-form">
+        {/* Year (readonly since it's fixed) */}
         <input
           type="text"
-          placeholder="Enter Year (e.g., 2020)"
           value={year}
-          onChange={(e) => setYear(e.target.value)}
-          required
+          readOnly
           className="search-input"
         />
+        {/* Department (readonly since it's fixed) */}
         <input
           type="text"
-          placeholder="Enter Department (e.g., ICT)"
           value={department}
-          onChange={(e) => setDepartment(e.target.value)}
-          required
+          readOnly
           className="search-input"
         />
+        {/* User only types number */}
         <input
           type="text"
-          placeholder="Enter Number (e.g., 01)"
+          placeholder="Enter Number (e.g., 110)"
           value={number}
           onChange={(e) => setNumber(e.target.value)}
           required
