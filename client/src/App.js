@@ -5,8 +5,9 @@ import jsPDF from 'jspdf';
 import './App.css';
 
 const App = () => {
-  const [year, setYear] = useState('2020'); // Default Year
-  const [department, setDepartment] = useState('ICT'); // Default Department
+  // Fixed defaults (no setters needed)
+  const [year] = useState('2020');
+  const [department] = useState('ICT');
   const [number, setNumber] = useState('');
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
@@ -65,7 +66,7 @@ const App = () => {
         <h2 className="results-title">Registration Number: {results.regNo}</h2>
         <h2 className="student-name">Name: {results.name}</h2>
 
-        {/* Show semesters in a grid of cards */}
+        {/* Show semesters in a grid */}
         <div className="semester-grid">
           {semesterEntries.map(([semester, data]) => (
             <div key={semester} className="semester-item">
@@ -109,24 +110,24 @@ const App = () => {
     <div className="app-container">
       <h1>Results Viewer</h1>
       <form onSubmit={handleSubmit} className="search-form">
-        {/* Year (readonly since it's fixed) */}
+        {/* Year (readonly) */}
         <input
           type="text"
           value={year}
           readOnly
           className="search-input"
         />
-        {/* Department (readonly since it's fixed) */}
+        {/* Department (readonly) */}
         <input
           type="text"
           value={department}
           readOnly
           className="search-input"
         />
-        {/* User only types number */}
+        {/* User only enters number */}
         <input
           type="text"
-          placeholder="Enter Number (e.g., 110)"
+          placeholder="Enter Number (e.g., 01)"
           value={number}
           onChange={(e) => setNumber(e.target.value)}
           required
