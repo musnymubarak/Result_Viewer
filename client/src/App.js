@@ -64,7 +64,7 @@ const App = () => {
     return 'pass';
   };
 
-  // Generate Standard A4 Printable Transcript PDF
+  // Generate Optimized A4 Printable Result PDF (JPEG compressed for small file size)
   const downloadPDF = () => {
     const transcriptElement = document.getElementById('a4-transcript-document');
     if (!transcriptElement) return;
@@ -73,7 +73,7 @@ const App = () => {
     transcriptElement.style.display = 'block';
 
     html2canvas(transcriptElement, {
-      scale: 2,
+      scale: 1.5, // Crisp resolution with compact memory footprint
       useCORS: true,
       backgroundColor: '#FFFFFF',
       windowWidth: 794
@@ -81,15 +81,16 @@ const App = () => {
       // Re-hide after capture
       transcriptElement.style.display = 'none';
 
-      const imgData = canvas.toDataURL('image/png');
+      // Use JPEG with 0.8 quality for ~90% file size reduction (150-250KB instead of 4MB)
+      const imgData = canvas.toDataURL('image/jpeg', 0.80);
       
       // Standard A4 dimensions in mm: 210mm x 297mm
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Official_Transcript_${results.regNo.replace(/\//g, '_')}.pdf`);
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      pdf.save(`Result_Statement_${results.regNo.replace(/\//g, '_')}.pdf`);
     }).catch(err => {
       transcriptElement.style.display = 'none';
       console.error('PDF Generation Error:', err);
@@ -247,21 +248,19 @@ const App = () => {
             </button>
 
             <button onClick={downloadPDF} className="action-btn primary" type="button">
-              📄 Download Official A4 Transcript (PDF)
+              📄 Download Result Sheet (PDF)
             </button>
           </div>
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* OFFICIAL A4 PRINTABLE TRANSCRIPT TEMPLATE (Hidden from web UI) */}
+        {/* A4 PRINTABLE RESULT STATEMENT TEMPLATE (Non-official, Student Viewing) */}
         {/* ------------------------------------------------------------- */}
         <div id="a4-transcript-document" className="a4-transcript-container" style={{ display: 'none' }}>
-          {/* Header & Crest */}
+          {/* Header */}
           <div className="a4-header">
-            <div className="a4-univ-title">UNIVERSITY OF VAVUNIYA, SRI LANKA</div>
-            <div className="a4-faculty-title">FACULTY OF TECHNOLOGICAL STUDIES</div>
-            <div className="a4-dept-title">Department of Information & Communication Technology</div>
-            <div className="a4-doc-title">OFFICIAL STATEMENT OF ACADEMIC RESULTS</div>
+            <div className="a4-doc-title">STUDENT ACADEMIC RESULT STATEMENT</div>
+            <div className="a4-non-official-note">(FOR STUDENT VIEWING PURPOSES ONLY — NOT AN OFFICIAL TRANSCRIPT)</div>
             <div className="a4-divider"></div>
           </div>
 
@@ -275,21 +274,15 @@ const App = () => {
                 <td className="val"><strong>{results.regNo}</strong></td>
               </tr>
               <tr>
-                <td className="lbl">Degree Program:</td>
-                <td className="val">{results.degreeTrack || 'Bachelor of Information & Communication Technology'}</td>
-                <td className="lbl">Date Issued:</td>
+                <td className="lbl">Degree Track:</td>
+                <td className="val">{results.degreeTrack || 'General Degree (90 Cr)'}</td>
+                <td className="lbl">Date Generated:</td>
                 <td className="val">{currentDate}</td>
-              </tr>
-              <tr>
-                <td className="lbl">Awarded Class:</td>
-                <td className="val" colSpan="3">
-                  <strong style={{ color: '#1E3A8A' }}>{results.degreeClass || 'N/A'}</strong>
-                </td>
               </tr>
             </tbody>
           </table>
 
-          {/* All Semester Course Tables in Standard 2-Column Transcript Grid */}
+          {/* All Semester Course Tables in Standard 2-Column Grid */}
           <div className="a4-semester-grid">
             {allSemesters.map(([semester, data]) => (
               <div key={semester} className="a4-sem-block">
@@ -328,27 +321,17 @@ const App = () => {
                   {results.year4Gpa && results.year4Gpa !== 'N/A' && (
                     <td>Year 4 GPA (30 Credits): <strong>{results.year4Gpa}</strong></td>
                   )}
-                  <td>FINAL DEGREE OCGPA: <strong style={{ fontSize: '15px', color: '#0F172A' }}>{results.overallGpa || 'N/A'}</strong></td>
+                  <td>CUMULATIVE OCGPA: <strong style={{ fontSize: '15px', color: '#0F172A' }}>{results.overallGpa || 'N/A'}</strong></td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          {/* Footer & Certification Signatures */}
+          {/* Disclaimer Footer (No Signatures) */}
           <div className="a4-footer">
-            <p className="a4-cert-text">
-              This statement of results is generated from the official academic examination database of the University of Vavuniya.
+            <p className="a4-disclaimer-notice">
+              <strong>Notice:</strong> This statement of academic results is generated automatically for student reference purposes only. It does not constitute an official academic transcript or graduation certificate.
             </p>
-            <div className="a4-signatures">
-              <div className="sig-line">
-                <div className="line"></div>
-                <div>Assistant Registrar (Examinations)</div>
-              </div>
-              <div className="sig-line">
-                <div className="line"></div>
-                <div>Dean / Faculty of Technological Studies</div>
-              </div>
-            </div>
           </div>
         </div>
       </>
